@@ -29,7 +29,11 @@ class ShaderApp {
 
         const loader = new THREE.TextureLoader();
         
-        const landscapeTexture = loader.load('./textures/landscape.jpg');
+        const landscapeTexture = await loader.loadAsync('./textures/landscape.jpg');
+
+        this.textureWidth = landscapeTexture.image.width;
+        this.textureHeight = landscapeTexture.image.height;
+        this.textureAspectRatio = landscapeTexture.image.width / landscapeTexture.image.height;
 
         this.material = new THREE.ShaderMaterial({
             uniforms: {
@@ -50,7 +54,16 @@ class ShaderApp {
     }
 
     onWindowResize() {
-        this.threejs.setSize(window.innerWidth, window.innerHeight);
+        const windowAspectRatio = window.innerWidth / window.innerHeight;
+
+        const width = windowAspectRatio > this.textureAspectRatio
+            ? this.textureWidth * window.innerHeight / this.textureHeight
+            : window.innerWidth;
+        const height = windowAspectRatio > this.textureAspectRatio
+            ? window.innerHeight
+            : this.textureHeight * window.innerWidth / this.textureWidth;
+
+        this.threejs.setSize(width, height);
     }
 
     onToggleWarpPressed(event) {
